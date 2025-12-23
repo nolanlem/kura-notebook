@@ -45,7 +45,7 @@ def return_idxs(arr):
 #%%
 
 # Directory containing the .npy files
-npy_dir = './stimuli_2/'
+npy_dir = './stimuli_3/' # checking stimuli_2 now
 
 # Get all .npy files in the directory
 npy_files = glob.glob(os.path.join(npy_dir, '*.npy'))
@@ -135,13 +135,14 @@ print(f"Total files renamed: {total_count}")
 
 if total_count == 0:
     print("No files were renamed. They might already be in the desired format.")
-#%%
-
+#%% sanity check: stimulus, beat windows, and onsets are all correct 
+os.chdir('/Users/nolanlem/Desktop/kura-notebook/')
 # plot the stimulus waveform and the onsets from the onsets datafile corresponding to that stimulus
-dir1 = './stimuli_1/' # this one in the git dir 
-dir2 = './stimuli_2/'
-stim1 = 'medium_n_72_1' 
-stim2 = 'medium_n_72_2'
+dir1 = './stimuli_3/' # this one in the git dir 
+dir2 = './stimuli_4/'
+stim1 = 'medium_n_81_3' 
+stim2 = 'medium_n_81_4'
+#stim1_ = 'strong_81_3'
 #stim1 = reformat_stim_name(stim1_) # NB: if using old naming conventions, but i changed them all 
 stimwf1 = join(dir1, stim1 + '.wav')
 stimwf2 = join(dir2, stim2 + '.wav')
@@ -151,11 +152,15 @@ y2, sr2 = librosa.load(stimwf2)
 y1 = y1[:sr1*4] # take only 4 seconds for better visual inspections
 y2 = y2[:sr2*4]
 
-y = y1 # which one to inspect?
-if y == y1: 
+# which stim, stimuli_1, or stimuli_2 to check?
+stim = stim1 # which one to inspect?
+
+if stim == stim1: 
+    y = y1
     stim = stim1
     dir = dir1 
 else: 
+    y = y2
     stim = stim2 
     dir = dir2
 
@@ -178,15 +183,15 @@ bpm_calculated_from_bws = 60./np.diff(librosa.samples_to_time(bws)).mean()
 print(f'stimulus bpm: {bpm} \t calculated bpm: {bpm_calculated_from_bws}')
 ########################################################
 # get the onsets
-stimdata = join(dir2, 'phases', 'onsets', stim2 + '.npy')
+stimdata = join(dir, 'phases', 'onsets', stim + '.npy')
 onsets = np.load(stimdata, allow_pickle=True)
 
 # sanity check, plot the onsets with wf 
-num_osc_to_plot = 20
+num_osc_to_plot = 50
 for osc_onsets in onsets[:num_osc_to_plot]:
     #osc_onsets_samples = librosa.time_to_samples(osc_onsets) # don't need this because onsets in this data file are already in samples
     osc_onsets = np.array(osc_onsets)
-    #osc_onsets = librosa.time_to_samples(osc_onsets)
+    osc_onsets = librosa.time_to_samples(osc_onsets)
     osc_onsets_samples = osc_onsets[osc_onsets < len(y2)] # portion that corresponds to first 15 beats
     ax[1].vlines(osc_onsets_samples, -1, 1, color='r', linewidth=0.2)
 ax[1].set_title(f'selected onsets of {num_osc_to_plot} oscillators')
@@ -212,12 +217,14 @@ ax[1].set_title(f'selected onsets of {num_osc_to_plot} oscillators')
 dir1 = '/Users/nolanlem/Documents/kura/kura-git/swarm-tapping-study/stim-no-timbre-5/stimuli_2'
 
 dir2 = '/Users/nolanlem/Desktop/tap-data-ccrma/Experiment-2/stimuli/' # this is one locally
+
+
 # example stimulus name 
-stim1 = 'strong_72_2' # test v.2
+stim1 = 'strong_n_72_2' # test v.2
 #stim1 = 'medium_81_1'
-stim2 = reformat_stim_name(stim2) # different naming convention which makes things confusing 
+#stim2 = reformat_stim_name(stim2) # different naming convention which makes things confusing 
 # get the stimname to open the .wav file assoc w it
-stimname1 = join(dir1, stim1 + '.wav')
+stimname1 = join(dir2, stim1 + '.wav')
 # load stim wfs
 y1, sr1 = librosa.load(stimname1)
 y1 = y1[:sr1*4]
@@ -242,7 +249,7 @@ for i,osc_onsets in enumerate(onsets[:20]):
 
 ax[1].set_title('selected onsets ')
 
-
+#%%
 
 # main root dir that holds all the data params files
 datadir = join(dir1, 'phases')
